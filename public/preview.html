@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件预览 - 系统面板</title>
+    <!-- 本地资源 -->
+    <link href="/assets/css/tailwind.min.css" rel="stylesheet">
+    <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
+    <script src="/assets/js/epub.min.js"></script>
+    <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNzU4NDQ1ODI1NTUwIiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjU0MDM5IiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiPjxwYXRoIGQ9Ik00OCA4NzMuNmE0NjQgMTIxLjYgMCAxIDAgOTI4IDAgNDY0IDEyMS42IDAgMSAwLTkyOCAwWiIgZmlsbD0iI0RBRTlGRiIgcC1pZD0iNTQwNDAiPjwvcGF0aD48cGF0aCBkPSJNNzg0IDg1My42SDI0MGMtNTIuOCAwLTk2LTQzLjItOTYtOTZWMjEyLjhjMC01Mi44IDQzLjItOTYgOTYtOTZoNTQ0YzUyLjggMCA5NiA0My4yIDk2IDk2djU0NC44YzAgNTIuOC00My4yIDk2LTk2IDk2eiIgZmlsbD0iIzFEODVEQiIgcC1pZD0iNTQwNDEiPjwvcGF0aD48cGF0aCBkPSJNNzg0IDgyMC44SDI0MGMtNTIuOCAwLTk2LTQzLjItOTYtOTZWMTM0LjRjMC01Mi44IDQzLjItOTYgOTYtOTZoNTQ0YzUyLjggMCA5NiA0My4yIDk2IDk2djU4OS42YzAgNTMuNi00My4yIDk2LjgtOTYgOTYuOHoiIGZpbGw9IiM0NTlERjUiIHAtaWQ9IjU0MDQyIj48L3BhdGg+PHBhdGggZD0iTTc1MiAyNzJINDUyYy0xNi44IDAtMzAuNC0xMy42LTMwLjQtMzAuNHYtMjhjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRINzUyYzE2LjggMCAzMC40IDEzLjYgMzAuNCAzMC40djI4Qzc4MS42IDI1OS4yIDc2OCAyNzIgNzUyIDI3MnoiIGZpbGw9IiNEQUU5RkYiIHAtaWQ9IjU0MDQzIj48L3BhdGg+PHBhdGggZD0iTTc0OCAyNjMuMkg0NDYuNGMtMTYuOCAwLTMwLjQtMTMuNi0zMC40LTMwLjR2LTI5LjZjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRoMzAxLjZjMTYuOCAwIDMwLjQgMTMuNiAzMC40IDMwLjR2MjkuNmMtMC44IDE2LjgtMTMuNiAzMC40LTMwLjQgMzAuNHoiIGZpbGw9IiNGRkZGRkYiIHAtaWQ9IjU0MDQ0Ij48L3BhdGg+PHBhdGggZD0iTTc1MiA0NzkuMkg0NTJjLTE2LjggMC0zMC40LTEzLjYtMzAuNC0zMC40di0yOGMwLTE2LjggMTMuNi0zMC40IDMwLjQtMzAuNEg3NTJjMTYuOCAwIDMwLjQgMTMuNiAzMC40IDMwLjR2MjhjLTAuOCAxNi44LTE0LjQgMzAuNC0zMC40IDMwLjR6IiBmaWxsPSIjREFFOUZGIiBwLWlkPSI1NDA0NSI+PC9wYXRoPjxwYXRoIGQ9Ik03NDIuNCA0NjguOGgtMjk2Yy0xNi44IDAtMzAuNC0xMy42LTMwLjQtMzAuNHYtMjhjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRoMjk2LjhjMTYuOCAwIDMwLjQgMTMuNiAzMC40IDMwLjR2MjhjLTAuOCAxNi44LTE0LjQgMzAuNC0zMS4yIDMwLjR6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSI1NDA0NiI+PC9wYXRoPjxwYXRoIGQ9Ik03NTIgNjg1LjZINDUyYy0xNi44IDAtMzAuNC0xMy42LTMwLjQtMzAuNHYtMjhjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRINzUyYzE2LjggMCAzMC40IDEzLjYgMzAuNCAzMC40djI4Yy0wLjggMTYuOC0xNC40IDMwLjQtMzAuNCAzMC40eiIgZmlsbD0iI0RBRTlGRiIgcC1pZD0iNTQwNDciPjwvcGF0aD48cGF0aCBkPSJNNzQyLjQgNjc1LjJoLTI5NmMtMTYuOCAwLTMwLjQtMTMuNi0zMC40LTMwLjR2LTI4YzAtMTYuOCAxMy42LTMwLjQgMzAuNC0zMC40aDI5Ni44YzE2LjggMCAzMC40IDEzLjYgMzAuNCAzMC40djI4Yy0wLjggMTYuOC0xNC40IDMwLjQtMzEuMiAzMC40eiIgZmlsbD0iI0ZGRkZGRiIgcC1pZD0iNTQwNDQiPjwvcGF0aD48cGF0aCBkPSJNMzAyLjQgMjcyaC0zNC40Yy0xMy42IDAtMjQuOC0xMS4yLTI0LjgtMjQuOHYtMzguNGMwLTEzLjYgMTEuMi0yNC44IDI0LjgtMjQuOGgzNC40YzEzLjYgMCAyNC44IDExLjIgMjQuOCAyNC44djM4LjRjMCAxMy42LTExLjIgMjQuOC0yNC44IDI0Ljh6IiBmaWxsPSIjREFFOUZGIiBwLWlkPSI1NDA0OSI+PC9wYXRoPjxwYXRoIGQ9Ik0zMDEuNiAyNjMuMmgtMzQuNGMtMTMuNiAwLTI0LjgtMTEuMi0yNC44LTI0Ljh2LTQwYzAtMTMuNiAxMS4yLTI0LjggMjQuOC0yNC44aDM0LjRjMTMuNiAwIDI0LjggMTEuMiAyNC44IDI0Ljh2NDBjMCAxMy42LTExLjIgMjQuOC0yNC44IDI0Ljh6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSI1NDA1MCI+PC9wYXRoPjxwYXRoIGQ9Ik0zMDIuNCA0NzkuMmgtMzQuNGMtMTMuNiAwLTI0LjgtMTEuMi0yNC44LTI0LjhWNDE2YzAtMTMuNiAxMS4yLTI0LjggMjQuOC0yNC44aDM0LjRjMTMuNiAwIDI0LjggMTEuMiAyNC44IDI0Ljh2MzguNGMwIDEzLjYtMTEuMiAyNC44LTI0LjggMjQuOHoiIGZpbGw9IiNEQUU5RkYiIHAtaWQ9IjU0MDUxIj48L3BhdGg+PHBhdGggZD0iTTMwMC44IDQ2OC44aC0zMy42Yy0xMy42IDAtMjQuOC0xMS4yLTI0LjgtMjQuOHYtMzkuMmMwLTEzLjYgMTEuMi0yNC44IDI0LjgtMjQuOGgzMy42YzEzLjYgMCAyNC44IDExLjIgMjQuOCAyNC44djM5LjJjMCAxMy42LTExLjIgMjQuOC0yNC44IDI0Ljh6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSI1NDA1MiI+PC9wYXRoPjxwYXRoIGQ9Ik0zMDIuNCA2ODUuNmgtMzQuNGMtMTMuNiAwLTI0LjgtMTEuMi0yNC44LTI0Ljh2LTM4LjRjMC0xMy42IDExLjItMjQuOCAyNC44LTI0LjhoMzQuNGMxMy42IDAgMjQuOCAxMS4yIDI0LjggMjQuOHYzOC40YzAgMTMuNi0xMS4yIDI0LjgtMjQuOCAyNC44eiIgZmlsbD0iI0RBRTlGRiIgcC1pZD0iNTQwNTMiPjwvcGF0aD48cGF0aCBkPSJNMzAwLjggNjc1LjJoLTMzLjZjLTEzLjYgMC0yNC44LTExLjItMjQuOC0yNC44di0zOS4yYzAtMTMuNiAxMS4yLTI0LjggMjQuOC0yNC44aDMzLjZjMTMuNiAwIDI0LjggMTEuMiAyNC44IDI0Ljh2MzkuMmMwIDEzLjYtMTEuMiAyNC44LTI0LjggMjQuOHoiIGZpbGw9IiNGRkZGRkYiIHAtaWQ9IjU0MDU0Ij48L3BhdGg+PC9zdmc+" type="image/svg+xml">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        dark: {
+                            100: '#1D2129',
+                            200: '#141414',
+                            300: '#0F0F0F'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* 页面切换过渡动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .preview-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .dark .preview-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .preview-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        .toolbar-glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .dark .toolbar-glass {
+            background: rgba(20, 20, 30, 0.95);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .spinner-glow {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+    </style>
+</head>
+<body class="bg-black dark:bg-dark-300">
+    <div class="preview-container">
+        <!-- 顶部工具栏 -->
+        <div class="toolbar-glass p-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
+                    <i class="fa fa-file-text-o text-white text-lg"></i>
+                </div>
+                <div>
+                    <h3 id="preview-title" class="text-lg font-bold text-gray-800 dark:text-white">文件预览</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">正在加载中...</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="preview-fullscreen" class="hidden btn-glass p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:text-white hover:from-blue-600 hover:to-purple-700" aria-label="全屏" title="全屏">
+                    <i class="fa fa-arrows-alt"></i>
+                </button>
+                <button id="preview-close" class="btn-glass p-3 rounded-lg text-gray-700 dark:text-gray-200 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all" aria-label="关闭" title="关闭">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- EPUB 工具栏 -->
+        <div id="preview-toolbar" class="hidden bg-white dark:bg-dark-200 border-b border-gray-200 dark:border-dark-100 p-3">
+        </div>
+
+        <!-- 预览内容区 -->
+        <div id="preview-content" class="preview-content">
+            <div id="preview-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-black/30 backdrop-blur-sm">
+                <div class="spinner-glow">
+                    <i class="fa fa-circle-o-notch fa-spin text-5xl text-white mb-4"></i>
+                </div>
+                <p class="text-white text-sm font-medium">加载中...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 主题初始化
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else {
+                // 根据系统偏好设置
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    document.documentElement.classList.add('dark');
+                }
+            }
+            // 监听主题变化事件（从其他页面）
+            window.addEventListener('themechange', (e) => {
+                if (e.detail.theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            });
+        })();
+
+        // 从URL参数获取文件信息
+        const urlParams = new URLSearchParams(window.location.search);
+        const type = urlParams.get('type'); // image, video, audio, text, epub, document
+        const filePath = urlParams.get('path');
+        const fileName = urlParams.get('name') || '文件';
+        const password = urlParams.get('password') || localStorage.getItem('authToken');
+
+        if (!type || !filePath || !password) {
+            document.getElementById('preview-content').innerHTML = '<p class="text-white">缺少必要参数，无法预览</p>';
+            document.getElementById('preview-spinner').classList.add('hidden');
+        } else {
+            // 设置标题
+            document.getElementById('preview-title').textContent = fileName;
+
+            const downloadUrl = `/api/cloud/download/${encodeURIComponent(filePath)}?password=${encodeURIComponent(password)}&inline=1`;
+            const previewUrl = `/api/cloud/preview?password=${encodeURIComponent(password)}&path=${encodeURIComponent(filePath)}`;
+            const content = document.getElementById('preview-content');
+            const spinner = document.getElementById('preview-spinner');
+            const toolbar = document.getElementById('preview-toolbar');
+            const fullscreenBtn = document.getElementById('preview-fullscreen');
+            // 将 currentMediaEl 提升到全局作用域，以便关闭按钮可以访问
+            window.currentMediaEl = null;
+
+            const hideSpinner = () => spinner.classList.add('hidden');
+
+            // 根据类型渲染内容
+            if (type === 'image') {
+                const img = document.createElement('img');
+                img.src = downloadUrl;
+                img.className = 'max-w-full max-h-[calc(100vh-80px)] object-contain';
+                img.alt = fileName;
+                img.onload = hideSpinner;
+                img.onerror = () => {
+                    hideSpinner();
+                    content.innerHTML = '<p class="text-white">图片加载失败</p>';
+                };
+                content.appendChild(img);
+            } else if (type === 'video') {
+                const wrap = document.createElement('div');
+                wrap.className = 'w-full h-full flex items-center justify-center relative';
+                const v = document.createElement('video');
+                v.src = downloadUrl;
+                v.controls = true;
+                v.playsInline = true;
+                v.className = 'w-full max-h-[calc(100vh-80px)] bg-black';
+                
+                // 简单配置：让浏览器自己处理，不干预
+                v.preload = 'metadata'; // 只加载元数据，不预加载视频内容
+                
+                // 隐藏加载提示
+                v.addEventListener('loadedmetadata', () => {
+                    hideSpinner();
+                });
+                
+                v.addEventListener('canplay', () => {
+                    hideSpinner();
+                    // 当可以播放时，立即尝试播放（不等待更多缓冲）
+                    if (v.paused && v.readyState >= 3) {
+                        v.play().catch(() => {
+                            // 自动播放被阻止，用户需要手动点击播放按钮
+                        });
+                    }
+                });
+                
+                v.addEventListener('error', (e) => {
+                    hideSpinner();
+                    console.error('视频播放错误:', e);
+                    content.innerHTML = '<p class="text-white">视频无法播放，请检查网络连接或文件格式</p>';
+                });
+                
+                wrap.appendChild(v);
+                content.appendChild(wrap);
+                window.currentMediaEl = v;
+                fullscreenBtn.classList.remove('hidden');
+                fullscreenBtn.onclick = () => {
+                    if (v.requestFullscreen) v.requestFullscreen().catch(() => {});
+                };
+            } else if (type === 'audio') {
+                const a = document.createElement('audio');
+                a.src = downloadUrl;
+                a.controls = true;
+                a.className = 'w-full max-w-2xl';
+                a.addEventListener('canplay', hideSpinner);
+                a.addEventListener('error', () => {
+                    hideSpinner();
+                    content.innerHTML = '<p class="text-white">音频无法播放</p>';
+                });
+                content.appendChild(a);
+                window.currentMediaEl = a;
+            } else if (type === 'text') {
+                fetch(downloadUrl).then(r => {
+                    if (!r.ok) throw new Error('无法获取文件');
+                    return r.text();
+                }).then(txt => {
+                    hideSpinner();
+                    const pre = document.createElement('pre');
+                    pre.className = 'whitespace-pre-wrap text-sm font-mono text-white p-4 max-w-full max-h-[calc(100vh-80px)] overflow-auto';
+                    pre.textContent = txt;
+                    content.appendChild(pre);
+                }).catch(err => {
+                    hideSpinner();
+                    content.innerHTML = `<p class="text-white">预览失败: ${err.message}</p>`;
+                });
+            } else if (type === 'epub') {
+                const readerWrap = document.createElement('div');
+                readerWrap.id = 'epub-reader';
+                readerWrap.style.width = '100%';
+                readerWrap.style.height = 'calc(100vh - 160px)';
+                readerWrap.style.overflow = 'hidden';
+                content.appendChild(readerWrap);
+
+                fetch(downloadUrl).then(resp => {
+                    if (!resp.ok) throw new Error(`无法获取 EPUB: ${resp.status}`);
+                    return resp.arrayBuffer();
+                }).then(ab => {
+                    const book = ePub(ab);
+                    const rendition = book.renderTo(readerWrap, { width: '100%', height: 'calc(100vh - 160px)' });
+                    window._epubBook = book;
+                    window._epubRendition = rendition;
+                    rendition.display().then(hideSpinner).catch(hideSpinner);
+
+                    toolbar.innerHTML = '<div class="flex items-center gap-2"><button id="epub-prev" class="px-3 py-1 bg-primary text-white rounded">上页</button><button id="epub-next" class="px-3 py-1 bg-primary text-white rounded">下页</button><div class="ml-4 flex items-center gap-2"><input id="epub-page-input" type="number" min="1" placeholder="页码" class="px-2 py-1 border rounded w-20" /><button id="epub-goto" class="px-3 py-1 bg-primary text-white rounded">跳转</button></div></div>';
+                    toolbar.classList.remove('hidden');
+
+                    const prev = document.getElementById('epub-prev');
+                    const next = document.getElementById('epub-next');
+                    const pageInput = document.getElementById('epub-page-input');
+                    const gotoBtn = document.getElementById('epub-goto');
+
+                    prev.onclick = () => { try { rendition.prev(); } catch (e) {} };
+                    next.onclick = () => { try { rendition.next(); } catch (e) {} };
+                    gotoBtn.disabled = true;
+
+                    if (window._epubBook) {
+                        window._epubBook.ready.then(() => {
+                            try {
+                                return window._epubBook.locations.generate();
+                            } catch (e) { return null; }
+                        }).then(() => {
+                            try {
+                                const total = (window._epubBook.locations && typeof window._epubBook.locations.length === 'function') ? window._epubBook.locations.length() : null;
+                                window._epubTotalLocations = total;
+                                gotoBtn.disabled = false;
+                                gotoBtn.onclick = () => {
+                                    const v = parseInt(pageInput.value, 10);
+                                    if (!v || !total) { alert('无法跳转：页码或位置索引不可用'); return; }
+                                    const idx = Math.max(1, Math.min(v, total));
+                                    const pct = total > 1 ? ((idx - 1) / (total - 1)) * 100 : 0;
+                                    try {
+                                        const cfi = window._epubBook.locations.cfiFromPercentage(pct);
+                                        rendition.display(cfi);
+                                    } catch (e) {
+                                        alert('跳转失败: ' + e.message);
+                                    }
+                                };
+                            } catch (e) {}
+                        }).catch(() => {});
+                    }
+
+                    rendition.on('relocated', (locData) => {
+                        try {
+                            if (pageInput && locData && locData.start) {
+                                if (typeof locData.start.location !== 'undefined' && window._epubTotalLocations) {
+                                    pageInput.value = (locData.start.location + 1);
+                                } else if (typeof locData.start.cfi === 'string' && window._epubBook && window._epubBook.locations && typeof window._epubBook.locations.percentageFromCfi === 'function') {
+                                    const pct = window._epubBook.locations.percentageFromCfi(locData.start.cfi) || 0;
+                                    if (window._epubTotalLocations) pageInput.value = Math.round((pct / 100) * window._epubTotalLocations);
+                                }
+                            }
+                        } catch (e) {}
+                    });
+                }).catch(err => {
+                    hideSpinner();
+                    content.innerHTML = `<p class="text-white">EPUB 渲染失败: ${err.message}</p>`;
+                });
+            } else if (type === 'document') {
+                const ext = fileName.split('.').pop().toLowerCase();
+                if (ext === 'docx') {
+                    fetch(previewUrl).then(r => {
+                        if (!r.ok) throw new Error('无法获取文档预览');
+                        return r.text();
+                    }).then(html => {
+                        hideSpinner();
+                        const wrap = document.createElement('div');
+                        wrap.className = 'w-full max-h-[calc(100vh-80px)] overflow-auto bg-white dark:bg-dark-200 p-4';
+                        wrap.innerHTML = html;
+                        content.appendChild(wrap);
+                    }).catch(err => {
+                        hideSpinner();
+                        content.innerHTML = `<p class="text-white">文档预览失败: ${err.message}</p>`;
+                    });
+                } else if (ext === 'pdf') {
+                    const iframe = document.createElement('iframe');
+                    iframe.src = downloadUrl;
+                    iframe.style.width = '100%';
+                    iframe.style.height = 'calc(100vh - 80px)';
+                    iframe.frameBorder = '0';
+                    iframe.onload = hideSpinner;
+                    iframe.onerror = () => {
+                        hideSpinner();
+                        content.innerHTML = '<p class="text-white">PDF 加载失败</p>';
+                    };
+                    content.appendChild(iframe);
+                } else {
+                    hideSpinner();
+                    content.innerHTML = '<p class="text-white">此文档类型暂不支持在线预览</p>';
+                }
+            } else {
+                hideSpinner();
+                content.innerHTML = '<p class="text-white">不支持的预览类型</p>';
+            }
+        }
+
+        // 关闭按钮功能
+        const closeBtn = document.getElementById('preview-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                // 暂停媒体
+                if (window.currentMediaEl && typeof window.currentMediaEl.pause === 'function') {
+                    try {
+                        window.currentMediaEl.pause();
+                        window.currentMediaEl.src = ''; // 清空源以停止加载
+                    } catch (e) {
+                        console.warn('暂停媒体失败:', e);
+                    }
+                }
+                // 清理 EPUB 实例
+                if (window._epubRendition) {
+                    try {
+                        window._epubRendition.destroy();
+                    } catch (e) {}
+                    window._epubRendition = null;
+                    window._epubBook = null;
+                }
+                // 退出全屏
+                if (document.fullscreenElement) {
+                    document.exitFullscreen().catch(() => {});
+                }
+                // 返回上一页或主页
+                if (window.history.length > 1) {
+                    window.history.back();
+                } else {
+                    window.location.href = '/';
+                }
+            });
+        }
+
+        // ESC 键关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('preview-close').click();
+            }
+        });
+    </script>
+</body>
+</html>
+
