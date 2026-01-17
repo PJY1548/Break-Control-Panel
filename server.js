@@ -11,7 +11,6 @@ const mammoth = require('mammoth');
 const mime = require('mime-types');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
-const WebSocket = require('ws');
 
 const app = express();
 
@@ -933,107 +932,15 @@ app.post('/api/cloud/move', async (req, res) => {
     }
 });
 
-// WebSocket服务器：用于TCP文件下载
-const WS_PORT = process.env.WS_PORT || (process.env.PORT ? parseInt(process.env.PORT) + 1 : 81);
-const wss = new WebSocket.Server({ port: WS_PORT });
-
-wss.on('connection', (ws, req) => {
-    log(`WebSocket连接建立 (IP: ${req.socket.remoteAddress})`, 'info');
-    
-    ws.on('message', async (message) => {
-        try {
-            const data = JSON.parse(message.toString());
-            
-            if (data.type === 'download') {
-                // 验证密码
-                if (!verifyPassword(data.password)) {
-                    ws.send(JSON.stringify({ type: 'error', message: '密码错误' }));
-                    ws.close();
-                    return;
-                }
-                
-                const filePath = data.path;
-                if (!filePath || !isValidPath(filePath)) {
-                    ws.send(JSON.stringify({ type: 'error', message: '无效路径' }));
-                    ws.close();
-                    return;
-                }
-                
-                const fullPath = path.resolve(CLOUD_DIR, filePath);
-                let stats;
-                try {
-                    stats = await fs.stat(fullPath);
-                } catch (err) {
-                    ws.send(JSON.stringify({ type: 'error', message: '文件不存在' }));
-                    ws.close();
-                    return;
-                }
-                
-                if (stats.isDirectory()) {
-                    ws.send(JSON.stringify({ type: 'error', message: '不能下载文件夹' }));
-                    ws.close();
-                    return;
-                }
-                
-                // 发送文件信息
-                ws.send(JSON.stringify({
-                    type: 'fileInfo',
-                    filename: path.basename(fullPath),
-                    size: stats.size
-                }));
-                
-                // 使用流式传输文件
-                const stream = fsSync.createReadStream(fullPath, { 
-                    highWaterMark: 1024 * 1024 // 1MB chunks for TCP传输
-                });
-                
-                stream.on('data', (chunk) => {
-                    if (ws.readyState === WebSocket.OPEN) {
-                        ws.send(chunk, { binary: true });
-                    }
-                });
-                
-                stream.on('end', () => {
-                    log(`WebSocket文件传输完成: ${fullPath} (IP: ${req.socket.remoteAddress})`);
-                    ws.send(JSON.stringify({ type: 'complete' }));
-                    ws.close();
-                });
-                
-                stream.on('error', (err) => {
-                    log(`WebSocket文件传输错误: ${err.message}`, 'error');
-                    ws.send(JSON.stringify({ type: 'error', message: err.message }));
-                    ws.close();
-                });
-                
-                ws.on('close', () => {
-                    stream.destroy();
-                });
-            } else {
-                ws.send(JSON.stringify({ type: 'error', message: '未知的请求类型' }));
-            }
-        } catch (error) {
-            log(`WebSocket消息处理错误: ${error.message}`, 'error');
-            ws.send(JSON.stringify({ type: 'error', message: error.message }));
-            ws.close();
-        }
-    });
-    
-    ws.on('error', (error) => {
-        log(`WebSocket错误: ${error.message}`, 'error');
-    });
-    
-    ws.on('close', () => {
-        log(`WebSocket连接关闭 (IP: ${req.socket.remoteAddress})`, 'info');
-    });
-});
+// WebSocket support removed: HTTP endpoints provide upload/download/preview.
 
 // 启动服务
 // 允许通过环境变量 PORT 指定端口，便于开发/测试时使用非 80 端口运行（无需管理员权限）
 const PORT = process.env.PORT || 80;
 const server = app.listen(PORT, () => {
     log(`HTTP服务已启动，访问 http://localhost:${PORT}`);
-    log(`WebSocket服务已启动，端口: ${WS_PORT}`);
     log(`网盘根目录: ${CLOUD_DIR}`);
     log('提示：请以管理员身份运行，否则可能无法执行系统命令');
 });
+
 
