@@ -105,11 +105,38 @@
         .dark .btn-outline {
             border-color: rgb(29 33 41);
         }
-        .btn-outline:hover {
+            .btn-outline:hover {
             background-color: rgb(242 243 245);
         }
         .dark .btn-outline:hover {
             background-color: rgb(29 33 41);
+        }
+        /* 保证当 .btn-outline 与 .bg-primary 同时存在时，优先显示主色并在 hover 时不被覆盖 */
+        .btn-outline.bg-primary,
+        .btn-outline.bg-primary:hover {
+            background-color: rgb(22 93 255);
+            color: rgb(255 255 255);
+            border-color: rgba(37,99,235,1);
+        }
+        /* 保证筛选按钮尺寸与布局稳定，避免因背景颜色变化导致尺寸/对齐抖动 */
+        .filter-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 2rem; /* 与 .btn-sm 保持一致 */
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            border-radius: 0.5rem;
+            gap: 0.5rem;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* 移动端覆盖 */
+        @media (max-width: 640px) {
+            #clear-search { right: 28px !important; }
+            #do-search { right: 12px !important; }
+            #filter-toggle { right: 2px !important; }
         }
         .btn-outline:focus {
             --tw-ring-color: rgb(22 93 255);
@@ -127,7 +154,7 @@
                 align-items: center;
                 justify-content: center;
             }
-            /* 小图标按钮（圆形），用于顶部工具栏等只含图标的交互 */
+            /* 小图标按钮 */
             .icon-btn {
             display: inline-flex;
             align-items: center;
@@ -138,7 +165,7 @@
             border-radius: 9999px;
             transition: all 300ms ease-in-out;
             }
-            /* 小号按钮（紧凑型），用于在需要更窄高度的场景 */
+            /* 小号按钮 */
             .btn-sm {
             height: 2rem;
             padding-left: 0.75rem;
@@ -176,7 +203,7 @@
             box-shadow: 0 0 0 2px var(--tw-ring-offset-color, #fff), 0 0 0 4px rgba(22, 93, 255, 0.5);
             border-color: transparent;
             }
-            /* 文件列表项与图标：采用灵活的基础样式，具体布局由响应式规则决定（详见下面的全局样式） */
+            /* 文件列表项与图标：采用灵活的基础样式，具体布局由响应式规则决定 */
             .file-item {
                 display: flex;
                 align-items: center;
@@ -248,7 +275,7 @@
             .custom-checkbox-input:checked + .custom-checkbox-box i { display: inline-block; }
     </style>
     <style>
-        /* 响应式文件项与图标：防止在小屏设备中图标或缩略图变形 */
+        /* 响应式文件项与图标： */
         .icon-container {
             width: 64px; /* 默认放大为 64px */
             height: 64px;
@@ -373,6 +400,36 @@
                 padding: 0.5rem 0.75rem;
             }
         }
+        /* 移动端右侧折叠筛选栏样式 */
+        #mobile-filter-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 260px;
+            max-width: 80%;
+            background: white;
+            z-index: 60;
+            box-shadow: -8px 0 30px rgba(0,0,0,0.12);
+            transform: translateX(100%);
+            transition: transform 260ms ease-in-out;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+        .dark #mobile-filter-drawer { background: #111827; color: #e5e7eb }
+        #mobile-filter-drawer.open { transform: translateX(0); }
+        #mobile-filter-drawer .drawer-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem }
+        #mobile-filter-list { display:flex; flex-wrap:wrap; gap:0.5rem }
+
+        /* 在小屏时隐藏页面内原始的 filter */
+        @media (max-width: 640px) {
+            #filter-buttons { display: none !important; }
+            /* 调整搜索相关按钮位置，确保垂直居中且间距均匀 */
+            #clear-search { right: 28px; }
+            #do-search { right: 12px; }
+            #filter-toggle { right: 2px; display: inline-flex; }
+        }
     </style>
     <!-- epub.js for EPUB rendering in preview -->
     <!-- JSZip is required by epub.js when passing ArrayBuffer/Blob input; load it first -->
@@ -388,7 +445,7 @@
                     <i class="fa fa-server text-white text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">裂开の系统面板</h1>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Break</h1>
                     <p class="text-xs text-gray-500 dark:text-gray-400">远程管理与文件存储</p>
                 </div>
             </div>
@@ -404,10 +461,9 @@
                 <div id="auth-status" class="hidden items-center gap-3">
                     <div class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
                         <i class="fa fa-check-circle text-green-500"></i>
-                        <span class="text-sm font-medium text-green-700 dark:text-green-300">已验证</span>
                     </div>
                     <button id="logout-btn" class="text-sm px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all-300">
-                        <i class="fa fa-sign-out mr-1"></i>退出
+                        <i class="fa fa-sign-out mr-1"></i>
                     </button>
                 </div>
             </div>
@@ -416,7 +472,6 @@
 
     <!-- 主内容区 -->
     <main class="flex-grow container mx-auto px-4 py-6">
-        <!-- 页面顶部不再显示系统状态卡片，已移入"系统控制"标签页 -->
 
         <!-- 功能标签页 -->
         <div class="bg-white dark:bg-dark-200 rounded-xl shadow-card dark:shadow-card-dark overflow-hidden mb-8">
@@ -529,34 +584,34 @@
                     
                     <div class="flex-1 md:flex-none mt-3 md:mt-0">
                         <div class="relative">
-                            <!-- 减小右侧内边距以适配两个右侧按钮（清除 + 搜索） -->
                             <input id="cloud-search" class="input pr-24" type="search" placeholder="搜索文件名">
-                            <!-- 将清除按钮移至搜索按钮左侧，避免与其重叠 -->
-                            <button id="clear-search" class="icon-btn-sm absolute right-20 top-1/2 -translate-y-1/2 text-gray-400 hidden" title="清除搜索"><i class="fa fa-times"></i></button>
                             <button id="do-search" class="btn btn-primary btn-sm absolute right-2 top-1/2 -translate-y-1/2">搜索</button>
+                            <button id="filter-toggle" class="icon-btn-sm absolute right-20 top-1/2 -translate-y-1/2 md:hidden text-gray-500" title="筛选">
+                                <i class="fa fa-filter"></i>
+                            </button>
                         </div>
-                        <div class="mt-2 flex gap-2 flex-wrap" id="filter-buttons">
-                            <button class="btn btn-outline btn-sm filter-btn" data-type="image">图片</button>
-                            <button class="btn btn-outline btn-sm filter-btn" data-type="video">视频</button>
-                            <button class="btn btn-outline btn-sm filter-btn" data-type="audio">音频</button>
-                            <button class="btn btn-outline btn-sm filter-btn" data-type="text">文本</button>
-                            <button class="btn btn-outline btn-sm filter-btn" data-type="doc">文档</button>
+
+                        <!-- 移动端右侧抽屉：在小屏显示筛选类型 -->
+                        <div id="mobile-filter-drawer" aria-hidden="true">
+                            <div class="drawer-header">
+                                <strong>筛选</strong>
+                                <button id="mobile-filter-close" class="icon-btn-sm text-gray-500"><i class="fa fa-times"></i></button>
+                            </div>
+                            <div id="mobile-filter-list"></div>
                         </div>
                     </div>
 
                     <div class="flex gap-3 md:ml-4">
                         <!-- 创建文件夹按钮 -->
                         <button id="create-folder-btn" class="btn btn-outline flex items-center">
-                            <i class="fa fa-folder mr-2"></i> 新建文件夹
+                            <i class="fa fa-folder mr-2"></i> 新目录
                         </button>
                         
                         <!-- 上传文件按钮 -->
                         <label class="btn btn-primary flex items-center cursor-pointer">
-                            <i class="fa fa-upload mr-2"></i> 上传文件
+                            <i class="fa fa-upload mr-2"></i> 上传
                             <input type="file" id="file-upload" class="hidden" multiple>
                         </label>
-                        
-                        <!-- 多选按钮已移除：使用每项复选框触发多选模式 -->
                     </div>
                 </div>
                 
@@ -632,7 +687,7 @@
         <button id="select-cancel" class="btn btn-outline">取消</button>
         <button id="select-rename" class="btn btn-primary" style="display: none;">重命名</button>
         <button id="select-delete" class="btn btn-danger">删除</button>
-        <button id="select-move" class="btn btn-primary">移动到...</button>
+        <button id="select-move" class="btn btn-primary">移动...</button>
     </div>
 
     <!-- 批量移动操作不使用输入模态，用户需在目标目录下点击"移动到此处" -->
@@ -667,7 +722,7 @@
                         <p class="text-sm text-right mt-1 text-gray-500" id="upload-speed">速率: 0 KB/s</p>
                 </div>
                 
-                <button id="cancel-upload-btn" class="btn-outline w-full">取消上传</button>
+                <button id="cancel-upload-btn" class="btn btn-outline w-full">取消上传</button>
             </div>
         </div>
     </div>
@@ -680,7 +735,7 @@
         let uploadXHR = null;
         let uploadState = null; // { startTime, lastLoaded, lastTime }
 
-        // 路径规范化工具：统一为不带首尾斜杠的以正斜杠分隔的路径（空字符串表示根目录）
+        // 路径规范化工具：统一为不带首尾斜杠的以正斜杠分隔的路径
         function normalizePath(p) {
             if (!p) return '';
             let s = String(p).replace(/\\/g, '/');
@@ -856,6 +911,56 @@
                 // 执行搜索以应用筛选
                 performSearch(elements.searchInput.value);
             });
+            // 移动端筛选抽屉相关绑定（复制原始筛选按钮并处理交互）
+            const filterToggle = document.getElementById('filter-toggle');
+            const mobileFilterDrawer = document.getElementById('mobile-filter-drawer');
+            const mobileFilterList = document.getElementById('mobile-filter-list');
+            const mobileFilterClose = document.getElementById('mobile-filter-close');
+
+            if (filterToggle && mobileFilterDrawer) {
+                filterToggle.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    mobileFilterDrawer.classList.toggle('open');
+                });
+            }
+            if (mobileFilterClose && mobileFilterDrawer) {
+                mobileFilterClose.addEventListener('click', (ev) => {
+                    ev.stopPropagation();
+                    mobileFilterDrawer.classList.remove('open');
+                });
+            }
+
+            // 在侧栏渲染筛选按钮（替代旧的内联筛选）
+            if (mobileFilterList) {
+                const types = [
+                    { key: 'image', label: '图片' },
+                    { key: 'video', label: '视频' },
+                    { key: 'audio', label: '音频' },
+                    { key: 'text', label: '文本' },
+                    { key: 'doc', label: '文档' }
+                ];
+                mobileFilterList.innerHTML = '';
+                types.forEach(t => {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn btn-outline btn-sm filter-btn';
+                    btn.dataset.type = t.key;
+                    btn.textContent = t.label;
+                    mobileFilterList.appendChild(btn);
+                });
+
+                // 处理抽屉内的筛选点击（不会自动关闭侧栏，需手动点击关闭）
+                mobileFilterList.addEventListener('click', (e) => {
+                    const btn = e.target.closest('.filter-btn');
+                    if (!btn) return;
+                    btn.classList.toggle('bg-primary');
+                    btn.classList.toggle('text-white');
+                    performSearch(elements.searchInput.value);
+                });
+            }
+
+            // 注意：抽屉不再在点击空白时自动关闭，用户需手动关闭（或按 ESC）
+            // ESC 关闭
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && mobileFilterDrawer) mobileFilterDrawer.classList.remove('open'); });
             // 返回上级按钮（可能动态隐藏）
             const goUpBtn = document.getElementById('go-up-btn');
             if (goUpBtn) goUpBtn.addEventListener('click', (e) => { e.preventDefault(); goUpOneLevel(); });
@@ -1739,49 +1844,11 @@
             return `${val.toFixed(2)} ${units[i]}`;
         }
 
-        // 下载文件（使用WebSocket TCP传输）
-        async function downloadFile(filePath, fileName) {
-            if (!authToken) {
-                showAuthModal();
-                return;
-            }
-
+        // 下载文件（使用 HTTP 下载）
+        function downloadFile(filePath, fileName) {
+            if (!authToken) { showAuthModal(); return; }
             try {
-                // 使用WebSocket TCP下载
-                await downloadFileViaWebSocket(filePath, fileName);
-            } catch (error) {
-                showCloudResult(`下载失败: ${error.message}`, false);
-            }
-        }
-
-        // WebSocket下载函数（备用，如果需要可以启用）
-        async function downloadFileViaWebSocket(filePath, fileName) {
-            if (!authToken) {
-                showAuthModal();
-                return;
-            }
-
-            try {
-                // 获取WebSocket端口（默认81，或HTTP端口+1）
-                const wsPort = window.location.port ? (parseInt(window.location.port) + 1) : 81;
-                const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${wsProtocol}//${window.location.hostname}:${wsPort}`;
-                
-                showCloudResult(`正在通过TCP连接下载: ${fileName || '文件'}...`, true);
-                
-                return new Promise((resolve, reject) => {
-                    const ws = new WebSocket(wsUrl);
-                    const chunks = [];
-                    let fileInfo = null;
-                    let connectionTimeout = null;
-                    let isResolved = false;
-                    
-                    // 设置连接超时（3秒）
-                    connectionTimeout = setTimeout(() => {
-                        if (!isResolved && ws.readyState === WebSocket.CONNECTING) {
-                            ws.close();
-                            // 降级到HTTP下载
-                            const url = `/api/cloud/download?password=${encodeURIComponent(authToken)}&path=${encodeURIComponent(filePath)}`;
+                const url = `/api/cloud/download?password=${encodeURIComponent(authToken)}&path=${encodeURIComponent(filePath)}`;
                 const a = document.createElement('a');
                 a.href = url;
                 a.target = '_blank';
@@ -1790,123 +1857,9 @@
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                            showCloudResult(`开始下载: ${fileName || '文件'}`, true);
-                            isResolved = true;
-                            resolve();
-                        }
-                    }, 3000);
-                    
-                    ws.onopen = () => {
-                        if (connectionTimeout) clearTimeout(connectionTimeout);
-                        // 发送下载请求
-                        ws.send(JSON.stringify({
-                            type: 'download',
-                            password: authToken,
-                            path: filePath
-                        }));
-                    };
-                    
-                    ws.onmessage = async (event) => {
-                        // 检查是否是JSON消息（文件信息或状态）
-                        if (typeof event.data === 'string') {
-                            try {
-                                const data = JSON.parse(event.data);
-                                if (data.type === 'fileInfo') {
-                                    fileInfo = data;
-                                    showCloudResult(`文件大小: ${(data.size / 1024 / 1024).toFixed(2)} MB，正在下载...`, true);
-                                } else if (data.type === 'complete') {
-                                    // 所有数据已接收，创建Blob并下载
-                                    const blob = new Blob(chunks, { type: 'application/octet-stream' });
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = fileName || fileInfo?.filename || 'download';
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                    URL.revokeObjectURL(url);
-                                    
-                                    showCloudResult(`下载完成: ${fileName || fileInfo?.filename || '文件'}`, true);
-                                    if (connectionTimeout) clearTimeout(connectionTimeout);
-                                    ws.close();
-                                    isResolved = true;
-                                    resolve();
-                                } else if (data.type === 'error') {
-                                    throw new Error(data.message);
-                                }
-                            } catch (e) {
-                                // JSON解析失败，可能是二进制数据，忽略
-                            }
-                        } else {
-                            // 二进制数据块：处理Blob或ArrayBuffer
-                            let dataChunk = event.data;
-                            if (dataChunk instanceof Blob) {
-                                dataChunk = await dataChunk.arrayBuffer();
-                            }
-                            chunks.push(dataChunk);
-                            
-                            // 显示下载进度
-                            if (fileInfo && fileInfo.size > 0) {
-                                const totalReceived = chunks.reduce((sum, chunk) => sum + (chunk.byteLength || chunk.length || 0), 0);
-                                const progress = ((totalReceived / fileInfo.size) * 100).toFixed(1);
-                                if (progress % 10 < 1) { // 每10%更新一次提示
-                                    showCloudResult(`下载进度: ${progress}% (${(totalReceived / 1024 / 1024).toFixed(2)} MB / ${(fileInfo.size / 1024 / 1024).toFixed(2)} MB)`, true);
-                                }
-                            }
-                        }
-                    };
-                    
-                    ws.onerror = (error) => {
-                        if (connectionTimeout) clearTimeout(connectionTimeout);
-                        if (isResolved) return;
-                        console.error('WebSocket错误:', error);
-                        showCloudResult(`WebSocket连接失败，尝试使用HTTP下载...`, false);
-                        // 降级到HTTP下载
-                        const url = `/api/cloud/download?password=${encodeURIComponent(authToken)}&path=${encodeURIComponent(filePath)}`;
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.target = '_blank';
-                        a.rel = 'noopener noreferrer';
-                        if (fileName) a.download = fileName;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
                 showCloudResult(`开始下载: ${fileName || '文件'}`, true);
-                        isResolved = true;
-                        resolve();
-                    };
-                    
-                    ws.onclose = () => {
-                        if (chunks.length > 0 && fileInfo) {
-                            // 如果连接关闭但还有数据，尝试创建文件
-                            const blob = new Blob(chunks, { type: 'application/octet-stream' });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = fileName || fileInfo.filename || 'download';
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                        }
-                    };
-                });
-            } catch (error) {
-                // 如果WebSocket失败，降级到HTTP下载
-                try {
-                    const url = `/api/cloud/download?password=${encodeURIComponent(authToken)}&path=${encodeURIComponent(filePath)}`;
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    if (fileName) a.download = fileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    showCloudResult(`开始下载: ${fileName || '文件'}`, true);
-                } catch (fallbackError) {
-                    showCloudResult(`下载失败: ${fallbackError.message}`, false);
-                }
+            } catch (err) {
+                showCloudResult(`下载失败: ${err.message}`, false);
             }
         }
 
@@ -2491,7 +2444,7 @@
 
 <footer class="bg-white dark:bg-dark-200 border-t border-light-200 dark:border-dark-100 py-4 mt-8">
     <div class="container mx-auto px-4 text-center text-sm text-gray-500 dark:text-gray-400">
-        <p>裂开·托尔斯泰 の 系统控制面板 &copy;  2025</p>
+        <p>裂开·托尔斯泰 の 系统控制面板 &copy;  2025-2026</p>
     </div>
 </footer>
 
