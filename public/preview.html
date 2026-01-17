@@ -48,43 +48,39 @@
             animation: fadeIn 0.3s ease-out;
         }
         .preview-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .dark .preview-container {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-        }
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                background: transparent; /* 与 body 背景保持一致 */
+            }
+            .dark .preview-container {
+                background: transparent;
+            }
         .preview-content {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
+            background: transparent; /* 使用页面背景，避免明显色块 */
         }
         .toolbar-glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: transparent; /* 与页面背景一致，简化视觉 */
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            box-shadow: none;
         }
         .dark .toolbar-glass {
-            background: rgba(20, 20, 30, 0.95);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: transparent;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
         }
         .btn-glass {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(0,0,0,0.06);
+            transition: all 0.18s ease;
         }
         .btn-glass:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background: rgba(255,255,255,0.08);
+            transform: none;
         }
         .spinner-glow {
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -97,15 +93,33 @@
                 opacity: 0.5;
             }
         }
+        /* EPUB TOC 侧边栏 */
+        .epub-toc-sidebar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 320px;
+            max-width: 90vw;
+            padding: 12px;
+            background: #ffffff;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateX(-100%);
+            transition: transform 220ms ease;
+            z-index: 40;
+            overflow: auto;
+        }
+        .epub-toc-sidebar.open { transform: translateX(0); }
+        .dark .epub-toc-sidebar { background: #141414; color: #fff; box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
     </style>
 </head>
-<body class="bg-black dark:bg-dark-300">
+<body class="font-inter bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-dark-300 dark:via-dark-200 dark:to-dark-100 text-gray-800 dark:text-gray-200">
     <div class="preview-container">
         <!-- 顶部工具栏 -->
         <div class="toolbar-glass p-4 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg">
-                    <i class="fa fa-file-text-o text-white text-lg"></i>
+                <div class="w-10 h-10 rounded-full bg-gray-200 dark:bg-dark-200 flex items-center justify-center shadow-sm">
+                    <i class="fa fa-file-text-o text-gray-700 dark:text-white text-lg"></i>
                 </div>
                 <div>
                     <h3 id="preview-title" class="text-lg font-bold text-gray-800 dark:text-white">文件预览</h3>
@@ -128,11 +142,11 @@
 
         <!-- 预览内容区 -->
         <div id="preview-content" class="preview-content">
-            <div id="preview-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-black/30 backdrop-blur-sm">
+            <div id="preview-spinner" class="absolute inset-0 flex flex-col items-center justify-center bg-transparent">
                 <div class="spinner-glow">
                     <i class="fa fa-circle-o-notch fa-spin text-5xl text-white mb-4"></i>
                 </div>
-                <p class="text-white text-sm font-medium">加载中...</p>
+                <p class="text-gray-700 dark:text-white text-sm font-medium">加载中...</p>
             </div>
         </div>
     </div>
@@ -257,7 +271,7 @@
                 }).then(txt => {
                     hideSpinner();
                     const pre = document.createElement('pre');
-                    pre.className = 'whitespace-pre-wrap text-sm font-mono text-white p-4 max-w-full max-h-[calc(100vh-80px)] overflow-auto';
+                    pre.className = 'whitespace-pre-wrap text-sm font-mono text-gray-900 dark:text-white p-4 max-w-full max-h-[calc(100vh-80px)] overflow-auto';
                     pre.textContent = txt;
                     content.appendChild(pre);
                 }).catch(err => {
@@ -282,7 +296,21 @@
                     window._epubRendition = rendition;
                     rendition.display().then(hideSpinner).catch(hideSpinner);
 
-                    toolbar.innerHTML = '<div class="flex items-center gap-2"><button id="epub-prev" class="px-3 py-1 bg-primary text-white rounded">上页</button><button id="epub-next" class="px-3 py-1 bg-primary text-white rounded">下页</button><div class="ml-4 flex items-center gap-2"><input id="epub-page-input" type="number" min="1" placeholder="页码" class="px-2 py-1 border rounded w-20" /><button id="epub-goto" class="px-3 py-1 bg-primary text-white rounded">跳转</button></div></div>';
+                    toolbar.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <button id="epub-prev" class="px-3 py-1 bg-primary text-white rounded">上页</button>
+                            <button id="epub-next" class="px-3 py-1 bg-primary text-white rounded">下页</button>
+                            <button id="epub-toc-toggle" class="px-3 py-1 btn-outline rounded">目录</button>
+                            <div class="ml-4 flex items-center gap-2">
+                                <input id="epub-page-input" type="number" min="1" placeholder="页码" class="px-2 py-1 border rounded w-20" />
+                                <button id="epub-goto" class="px-3 py-1 bg-primary text-white rounded">跳转</button>
+                            </div>
+                            <div class="ml-4 flex items-center gap-2">
+                                <button id="epub-font-decrease" class="px-2 py-1 btn-outline rounded">A-</button>
+                                <button id="epub-font-increase" class="px-2 py-1 btn-outline rounded">A+</button>
+                            </div>
+                        </div>
+                    `;
                     toolbar.classList.remove('hidden');
 
                     const prev = document.getElementById('epub-prev');
@@ -293,6 +321,96 @@
                     prev.onclick = () => { try { rendition.prev(); } catch (e) {} };
                     next.onclick = () => { try { rendition.next(); } catch (e) {} };
                     gotoBtn.disabled = true;
+
+                    // TOC toggle and rendering (sidebar)
+                    const tocToggle = document.getElementById('epub-toc-toggle');
+                    let tocContainer = document.getElementById('epub-toc-sidebar');
+                    if (!tocContainer) {
+                        tocContainer = document.createElement('aside');
+                        tocContainer.id = 'epub-toc-sidebar';
+                        tocContainer.className = 'epub-toc-sidebar';
+                        content.appendChild(tocContainer);
+                    }
+
+                    function renderTocItems(items, parent) {
+                        if (!items || items.length === 0) return;
+                        const ul = document.createElement('ul');
+                        ul.className = 'text-sm p-0 m-0 list-none';
+                        items.forEach(it => {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = '#';
+                            a.textContent = it.label || it.title || it.text || '章节';
+                            a.className = 'block py-2 px-1 hover:text-primary cursor-pointer';
+                            a.onclick = (e) => {
+                                e.preventDefault();
+                                try {
+                                    rendition.display(it.href);
+                                    // close sidebar
+                                    tocContainer.classList.remove('open');
+                                    readerWrap.style.width = '100%';
+                                    readerWrap.style.marginLeft = '0';
+                                    try { rendition.resize(); } catch (e) {}
+                                } catch (err) {}
+                            };
+                            li.appendChild(a);
+                            if (it.subitems && it.subitems.length) {
+                                renderTocItems(it.subitems, li);
+                            }
+                            ul.appendChild(li);
+                        });
+                        parent.appendChild(ul);
+                    }
+
+                    tocToggle.onclick = async () => {
+                        if (!tocContainer) return;
+                        if (!tocContainer.dataset.loaded) {
+                            tocContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 p-2">正在加载目录...</p>';
+                            try {
+                                let tocItems = [];
+                                if (window._epubBook && (window._epubBook.navigation && window._epubBook.navigation.toc)) {
+                                    tocItems = window._epubBook.navigation.toc;
+                                } else if (window._epubBook && window._epubBook.toc) {
+                                    tocItems = window._epubBook.toc;
+                                }
+                                tocContainer.innerHTML = '';
+                                if (tocItems && tocItems.length) {
+                                    renderTocItems(tocItems, tocContainer);
+                                } else {
+                                    tocContainer.innerHTML = '<p class="text-sm text-gray-500 dark:text-gray-400 p-2">目录不可用</p>';
+                                }
+                                tocContainer.dataset.loaded = '1';
+                            } catch (err) {
+                                tocContainer.innerHTML = '<p class="text-sm text-red-500 p-2">加载目录失败</p>';
+                            }
+                        }
+
+                        const opened = tocContainer.classList.toggle('open');
+                        if (opened) {
+                            readerWrap.style.width = 'calc(100% - 320px)';
+                            readerWrap.style.marginLeft = '320px';
+                        } else {
+                            readerWrap.style.width = '100%';
+                            readerWrap.style.marginLeft = '0';
+                        }
+                        try { rendition.resize(); } catch (e) {}
+                    };
+
+                    // Font size controls: adjust rendition themes by injecting CSS
+                    const fontIncreaseBtn = document.getElementById('epub-font-increase');
+                    const fontDecreaseBtn = document.getElementById('epub-font-decrease');
+                    let currentFontPercent = 100;
+                    function applyFontSize() {
+                        try {
+                            const css = `html { font-size: ${currentFontPercent}% !important; }`;
+                            rendition.themes.register('user-font-size', css);
+                            rendition.themes.select('user-font-size');
+                        } catch (e) {
+                            // ignore if rendition not ready
+                        }
+                    }
+                    fontIncreaseBtn.onclick = () => { currentFontPercent = Math.min(200, currentFontPercent + 10); applyFontSize(); };
+                    fontDecreaseBtn.onclick = () => { currentFontPercent = Math.max(60, currentFontPercent - 10); applyFontSize(); };
 
                     if (window._epubBook) {
                         window._epubBook.ready.then(() => {
