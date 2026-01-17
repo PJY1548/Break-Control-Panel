@@ -284,6 +284,15 @@ if (-not (Test-Path $inputCssPath)) {
 # 构建 Tailwind CSS
 Write-Host "构建 Tailwind CSS 样式文件..." -ForegroundColor Cyan
 try {
+    # 尝试更新 Browserslist 数据库以避免 caniuse-lite 过期警告
+    Write-Host "尝试更新 Browserslist 数据库..." -ForegroundColor Cyan
+    try {
+        npx update-browserslist-db@latest --update-db --quiet 2>$null
+        Write-Host "✓ Browserslist 数据库已更新" -ForegroundColor Green
+    } catch {
+        Write-Host "⚠️ 无法更新 Browserslist 数据库，继续构建..." -ForegroundColor Yellow
+    }
+
     npm run build:css
     Write-Host "✓ Tailwind CSS 构建完成（tailwind.min.css）" -ForegroundColor Green
 } catch {
