@@ -84,7 +84,7 @@ const CLOUD_ROOT = path.resolve(CLOUD_DIR);
 fsExtra.ensureDirSync(CLOUD_DIR);
 
 // 管理员密码哈希（请替换为实际密码哈希）
-const passwordHash = '$2a$10$1CFfz4K478cIjc1QU/U3tOoDoAr9mUTvSxHMi6zWVhBZkdq0Gm/m2';
+const passwordHash = '$hashplaceholder$';
 
 // 文件上传配置
 const upload = multer({
@@ -1206,6 +1206,3 @@ const server = app.listen(PORT, () => {
     log(`网盘根目录: ${CLOUD_DIR}`);
     log('提示：请以管理员身份运行，否则可能无法执行系统命令');
 });
-
-
-
