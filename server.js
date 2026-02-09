@@ -11,8 +11,13 @@ const mammoth = require('mammoth');
 const mime = require('mime-types');
 const multer = require('multer');
 const { v4: uuidv4 } = require('uuid');
+const { parseFile } = require('music-metadata');
 
 const app = express();
+
+// 优化：修复HTTP 431错误 - 增加请求头大小限制
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // 优化：添加压缩中间件（对非视频文件启用gzip压缩）
 const compression = require('compression');
@@ -27,8 +32,6 @@ app.use(compression({
     },
     level: 6 // 压缩级别（1-9，6是平衡点）
 }));
-
-app.use(express.json());
 
 // 优化：设置全局HTTP头
 app.use((req, res, next) => {
@@ -63,6 +66,16 @@ app.use((req, res, next) => {
     next();
 });
 
+// 为HTML文件添加防缓存头
+app.use((req, res, next) => {
+    if (req.path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+    }
+    next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // 网盘根目录配置
@@ -71,7 +84,7 @@ const CLOUD_ROOT = path.resolve(CLOUD_DIR);
 fsExtra.ensureDirSync(CLOUD_DIR);
 
 // 管理员密码哈希（请替换为实际密码哈希）
-const passwordHash = '$hashplaceholder$';
+const passwordHash = '$2a$10$1CFfz4K478cIjc1QU/U3tOoDoAr9mUTvSxHMi6zWVhBZkdq0Gm/m2';
 
 // 文件上传配置
 const upload = multer({
@@ -333,7 +346,9 @@ app.post('/api/cloud/list', async (req, res) => {
                 isDirectory: file.isDirectory(),
                 size: stats.size, // 字节数
                 modified: stats.mtime.toISOString(),
-                path: path.join(userPath, file.name)
+                path: path.join(userPath, file.name),
+                // 添加类型检测逻辑，用于决定预览链接
+                type: getFileType(path.join(targetDir, file.name))
             };
         }));
 
@@ -348,6 +363,27 @@ app.post('/api/cloud/list', async (req, res) => {
         res.json({ success: false, message: error.message });
     }
 });
+
+// 辅助函数：确定文件类型
+function getFileType(filePath) {
+    const ext = path.extname(filePath).toLowerCase().replace('.', '');
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'epub'].includes(ext)) {
+        return 'document';
+    }
+    if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'].includes(ext)) {
+        return 'image';
+    }
+    if (['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv', 'wmv'].includes(ext)) {
+        return 'video';
+    }
+    if (['mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a'].includes(ext)) {
+        return 'audio';
+    }
+    if (['txt', 'md', 'json', 'xml', 'log', 'csv', 'js', 'css', 'html', 'py', 'java', 'cpp', 'c', 'h', 'sql', 'ts'].includes(ext)) {
+        return 'text';
+    }
+    return 'other';
+}
 
 // 2. 创建文件夹
 app.post('/api/cloud/mkdir', async (req, res) => {
@@ -441,7 +477,14 @@ app.post('/api/cloud/search', async (req, res) => {
 
                     if (!query || it.name.toLowerCase().includes(query.toLowerCase())) {
                         const stats = await fs.stat(full);
-                        results.push({ name: it.name, path: rel, size: stats.size, modified: stats.mtime.toISOString(), isDirectory: false });
+                        results.push({ 
+                            name: it.name, 
+                            path: rel, 
+                            size: stats.size, 
+                            modified: stats.mtime.toISOString(), 
+                            isDirectory: false,
+                            type: getFileType(full) // 添加类型信息
+                        });
                     }
                 }
             }
@@ -499,6 +542,227 @@ app.get('/api/cloud/preview', async (req, res) => {
     } catch (err) {
         log(`预览失败: ${err.message}`, 'error');
         if (!res.headersSent) return res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// 从MP3/音频文件ID3标签提取专辑封面
+app.get('/api/cloud/audio/metadata', async (req, res) => {
+    try {
+        const password = req.query.password;
+        const filePath = req.query.path;
+
+        if (!verifyPassword(password)) return res.status(401).json({ success: false, message: '密码错误' });
+        if (!filePath) return res.status(400).json({ success: false, message: '未提供路径' });
+        if (!isValidPath(filePath)) return res.status(400).json({ success: false, message: '无效路径' });
+
+        const fullPath = path.resolve(CLOUD_DIR, filePath);
+        const stats = await fs.stat(fullPath);
+        if (!stats.isFile()) return res.status(400).json({ success: false, message: '必须是文件' });
+
+        // 解析音频元数据（包括ID3标签）
+        const metadata = await parseFile(fullPath);
+        
+        // 检查是否有专辑封面
+        let pictureBuf = null;
+        let pictureMime = null;
+        
+        if (metadata.common && metadata.common.picture && metadata.common.picture.length > 0) {
+            const pic = metadata.common.picture[0];
+            pictureBuf = pic.data;
+            pictureMime = pic.format || 'image/jpeg';
+        }
+        
+        // 如果没有找到ID3封面，尝试查找同目录的cover/folder文件
+        if (!pictureBuf) {
+            const dir = path.dirname(fullPath);
+            const basename = path.basename(fullPath, path.extname(fullPath));
+            const coverCandidates = [
+                path.join(dir, basename + '.jpg'),
+                path.join(dir, basename + '.png'),
+                path.join(dir, basename + '.jpeg'),
+                path.join(dir, 'cover.jpg'),
+                path.join(dir, 'cover.png'),
+                path.join(dir, 'cover.jpeg'),
+                path.join(dir, 'folder.jpg'),
+                path.join(dir, 'folder.png'),
+                path.join(dir, 'folder.jpeg')
+            ];
+            
+            for (const candidate of coverCandidates) {
+                try {
+                    const stat = await fs.stat(candidate);
+                    if (stat.isFile()) {
+                        pictureBuf = await fs.readFile(candidate);
+                        pictureMime = mime.lookup(candidate) || 'image/jpeg';
+                        break;
+                    }
+                } catch (e) {
+                    // 文件不存在，继续下一个
+                }
+            }
+        }
+        
+        if (pictureBuf) {
+            res.set('Content-Type', pictureMime);
+            res.set('Cache-Control', 'public, max-age=86400');
+            return res.send(pictureBuf);
+        }
+        
+        return res.status(404).json({ success: false, message: '找不到专辑封面' });
+    } catch (err) {
+        log(`音频元数据提取失败: ${err.message}`, 'error');
+        if (!res.headersSent) return res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// 新增API：获取目录中的音频文件列表（用于前端构建播放列表）
+app.post('/api/cloud/audio/playlist', async (req, res) => {
+    try {
+        if (!verifyPassword(req.body.password)) {
+            return res.json({ success: false, message: '密码错误' });
+        }
+
+        const dirPath = req.body.path || '';
+        if (!isValidPath(dirPath)) {
+            return res.json({ success: false, message: '无效路径' });
+        }
+
+        const targetDir = path.join(CLOUD_DIR, dirPath);
+        
+        // 检查目录存在
+        try {
+            const stats = await fs.stat(targetDir);
+            if (!stats.isDirectory()) {
+                return res.json({ success: false, message: '路径不是目录' });
+            }
+        } catch (err) {
+            return res.json({ success: false, message: '目录不存在' });
+        }
+
+        const files = await fs.readdir(targetDir);
+        const audioExtensions = ['.mp3', '.wav', '.flac', '.aac', '.m4a', '.ogg', '.wma', '.opus'];
+        
+        // 过滤和排序音频文件
+        const audioFiles = files
+            .filter(file => audioExtensions.some(ext => file.toLowerCase().endsWith(ext)))
+            .sort((a, b) => a.localeCompare(b))
+            .map((name, index) => ({
+                index: index,
+                name: name,
+                path: path.join(dirPath, name).replace(/\\/g, '/')
+            }));
+
+        res.json({
+            success: true,
+            path: dirPath,
+            files: audioFiles
+        });
+    } catch (error) {
+        log(`音频播放列表获取失败: ${error.message}`, 'error');
+        res.json({ success: false, message: error.message });
+    }
+});
+
+// 新增API：获取目录中的视频文件列表（用于前端构建播放列表）
+app.post('/api/cloud/video/playlist', async (req, res) => {
+    try {
+        if (!verifyPassword(req.body.password)) {
+            return res.json({ success: false, message: '密码错误' });
+        }
+
+        const dirPath = req.body.path || '';
+        if (!isValidPath(dirPath)) {
+            return res.json({ success: false, message: '无效路径' });
+        }
+
+        const targetDir = path.join(CLOUD_DIR, dirPath);
+        
+        // 检查目录存在
+        try {
+            const stats = await fs.stat(targetDir);
+            if (!stats.isDirectory()) {
+                return res.json({ success: false, message: '路径不是目录' });
+            }
+        } catch (err) {
+            return res.json({ success: false, message: '目录不存在' });
+        }
+
+        const files = await fs.readdir(targetDir);
+        const videoExtensions = ['.mp4', '.avi', '.mov', '.mkv', '.webm', '.flv', '.wmv', '.m4v'];
+        
+        // 过滤和排序视频文件
+        const videoFiles = files
+            .filter(file => videoExtensions.some(ext => file.toLowerCase().endsWith(ext)))
+            .sort((a, b) => a.localeCompare(b))
+            .map((name, index) => ({
+                index: index,
+                name: name,
+                path: path.join(dirPath, name).replace(/\\/g, '/')
+            }));
+
+        res.json({
+            success: true,
+            path: dirPath,
+            files: videoFiles
+        });
+    } catch (error) {
+        log(`视频播放列表获取失败: ${error.message}`, 'error');
+        res.json({ success: false, message: error.message });
+    }
+});
+
+// 音频/视频封面查找接口
+app.get('/api/cloud/cover', async (req, res) => {
+    try {
+        const password = req.query.password;
+        const filePath = req.query.path;
+
+        if (!verifyPassword(password)) return res.status(401).json({ success: false, message: '密码错误' });
+        if (!filePath) return res.status(400).json({ success: false, message: '未提供路径' });
+        if (!isValidPath(filePath)) return res.status(400).json({ success: false, message: '无效路径' });
+
+        const fullPath = path.resolve(CLOUD_DIR, filePath);
+        const stats = await fs.stat(fullPath);
+        if (stats.isDirectory()) return res.status(400).json({ success: false, message: '不能查找文件夹的封面' });
+
+        const dir = path.dirname(fullPath);
+        const filename = path.basename(fullPath);
+        const lastDotIdx = filename.lastIndexOf('.');
+        const base = lastDotIdx > 0 ? filename.substring(0, lastDotIdx) : filename;
+        
+        const candidates = [
+            path.join(dir, base + '.jpg'),
+            path.join(dir, base + '.png'),
+            path.join(dir, base + '.jpeg'),
+            path.join(dir, 'cover.jpg'),
+            path.join(dir, 'cover.png'),
+            path.join(dir, 'cover.jpeg'),
+            path.join(dir, 'folder.jpg'),
+            path.join(dir, 'folder.png')
+        ];
+
+        for (const candidatePath of candidates) {
+            try {
+                const stats = await fs.stat(candidatePath);
+                if (stats.isFile()) {
+                    const contentType = mime.lookup(candidatePath) || 'application/octet-stream';
+                    if (contentType.startsWith('image/')) {
+                        res.setHeader('Content-Type', contentType);
+                        res.setHeader('Cache-Control', 'public, max-age=3600');
+                        const stream = fsSync.createReadStream(candidatePath);
+                        stream.pipe(res);
+                        return;
+                    }
+                }
+            } catch (e) {
+                // continue to next candidate
+            }
+        }
+        
+        res.status(404).json({ success: false, message: '未找到封面' });
+    } catch (err) {
+        log(`封面查找失败: ${err.message}`, 'error');
+        if (!res.headersSent) res.status(500).json({ success: false, message: err.message });
     }
 });
 
@@ -942,5 +1206,6 @@ const server = app.listen(PORT, () => {
     log(`网盘根目录: ${CLOUD_DIR}`);
     log('提示：请以管理员身份运行，否则可能无法执行系统命令');
 });
+
 
 
