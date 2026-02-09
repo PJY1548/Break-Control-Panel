@@ -10,4 +10,8 @@
 ### 1.右键setup.ps1点击编辑而不是运行 
 ### 2.在Powershell ISE中点击右上方的三角形运行
 #### 注：忽略一些版本导致的语法错误
+### 3.JSZips使用浏览器储存到项目\public\assets\js中（安全问题，无法解决）
+### 4.卡在update-browserslist-db@1.2.3时，在上方编辑区将6-259行删除，保存并停止运行,先不关闭；
+### 5.打开cmd定位到安装目录执行npm install update-browserslist-db@1.2.3
+### 6.重新Powershell ISE中点击右上方的三角形运行
 ## 五.正常完成安装程序
