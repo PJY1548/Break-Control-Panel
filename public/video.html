@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>视频播放器 - 系统面板</title>
+    <!-- 本地资源 -->
+    <link href="/assets/css/tailwind.min.css" rel="stylesheet">
+    <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBzdGFuZGFsb25lPSJubyI/PjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+PHN2ZyB0PSIxNzU4NDQ1ODI1NTUwIiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjU0MDM5IiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgd2lkdGg9IjIwMCIgaGVpZ2h0PSIyMDAiPjxwYXRoIGQ9Ik00OCA4NzMuNmE0NjQgMTIxLjYgMCAxIDAgOTI4IDAgNDY0IDEyMS42IDAgMSAwLTkyOCAwWiIgZmlsbD0iI0RBRTlGRiIgcC1pZD0iNTQwNDAiPjwvcGF0aD48cGF0aCBkPSJNNzg0IDg1My42SDI0MGMtNTIuOCAwLTk2LTQzLjItOTYtOTZWMjEyLjhjMC01Mi44IDQzLjItOTYgOTYtOTZoNTQ0YzUyLjggMCA5NiA0My4yIDk2IDk2djU0NC44YzAgNTIuOC00My4yIDk2LTk2IDk2eiIgZmlsbD0iIzFEODVEQiIgcC1pZD0iNTQwNDEiPjwvcGF0aD48cGF0aCBkPSJNNzg0IDgyMC44SDI0MGMtNTIuOCAwLTk2LTQzLjItOTYtOTZWMTM0LjRjMC01Mi44IDQzLjItOTYgOTYtOTZoNTQ0YzUyLjggMCA5NiA0My4yIDk2IDk2djU4OS42YzAgNTMuNi00My4yIDk2LjgtOTYgOTYuOHoiIGZpbGw9IiM0NTlERjUiIHAtaWQ9IjU0MDQyIj48L3BhdGg+PHBhdGggZD0iTTc1MiAyNzJINDUyYy0xNi44IDAtMzAuNC0xMy42LTMwLjQtMzAuNHYtMjhjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRINzUyYzE2LjggMCAzMC40IDEzLjYgMzAuNCAzMC40djI4Qzc4MS42IDI1OS4yIDc2OCAyNzIgNzUyIDI3MnoiIGZpbGw9IiNEQUU5RkYiIHAtaWQ9IjU0MDQzIj48L3BhdGg+PHBhdGggZD0iTTc0OCAyNjMuMkg0NDYuNGMtMTYuOCAwLTMwLjQtMTMuNi0zMC40LTMwLjR2LTI5LjZjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRoMzAxLjZjMTYuOCAwIDMwLjQgMTMuNiAzMC40IDMwLjR2MjkuNmMtMC44IDE2LjgtMTMuNiAzMC40LTMwLjQgMzAuNHoiIGZpbGw9IiNGRkZGRkYiIHAtaWQ9IjU0MDQ0Ij48L3BhdGg+PHBhdGggZD0iTTc1MiA0NzkuMkg0NTJjLTE2LjggMC0zMC40LTEzLjYtMzAuNC0zMC40di0yOGMwLTE2LjggMTMuNi0zMC40IDMwLjQtMzAuNEg3NTJjMTYuOCAwIDMwLjQgMTMuNiAzMC40IDMwLjR2MjhjLTAuOCAxNi44LTE0LjQgMzAuNC0zMC40IDMwLjR6IiBmaWxsPSIjREFFOUZGIiBwLWlkPSI1NDA0NSI+PC9wYXRoPjxwYXRoIGQ9Ik03NDIuNCA0NjguOGgtMjk2Yy0xNi44IDAtMzAuNC0xMy42LTMwLjQtMzAuNHYtMjhjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRoMjk2LjhjMTYuOCAwIDMwLjQgMTMuNiAzMC40IDMwLjR2MjhjLTAuOCAxNi44LTE0LjQgMzAuNC0zMS4yIDMwLjR6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSI1NDA0NiI+PC9wYXRoPjxwYXRoIGQ9Ik03NTIgNjg1LjYgNDUyYy0xNi44IDAtMzAuNC0xMy42LTMwLjQtMzAuNHYtMjhjMC0xNi44IDEzLjYtMzAuNCAzMC40LTMwLjRINzUyYzE2LjggMCAzMC40IDEzLjYgMzAuNCAzMC40djI4Yy0wLjggMTYuOC0xNC40IDMwLjQtMzAuNCAzMC40eiIgZmlsbD0iI0RBRTlGRiIgcC1pZD0iNTQwNDciPjwvcGF0aD48cGF0aCBkPSJNNzQyLjQgNjc1LjJoLTI5NmMtMTYuOCAwLTMwLjQtMTMuNi0zMC40LTMwLjR2LTI4YzAtMTYuOCAxMy42LTMwLjQgMzAuNC0zMC40aDI5Ni44YzE2LjggMCAzMC40IDEzLjYgMzAuNCAzMC40djI4Yy0wLjggMTYuOC0xNC40IDMwLjQtMzEuMiAzMC40eiIgZmlsbD0iI0ZGRkZGRiIgcC1pZD0iNTQwNDgiPjwvcGF0aD48cGF0aCBkPSJNMzAyLjQgMjcyaC0zNC40Yy0xMy42IDAtMjQuOC0xMS4yLTI0LjgtMjQuOHYtMzguNGMwLTEzLjYgMTEuMi0yNC44IDI0LjgtMjQuOGgzNC40YzEzLjYgMCAyNC44IDExLjIgMjQuOCAyNC44djM4LjRjMCAxMy42LTExLjIgMjQuOC0yNC44IDI0Ljh6IiBmaWxsPSIjREFFOUZGIiBwLWlkPSI1NDA0OSI+PC9wYXRoPjxwYXRoIGQ9Ik0zMDEuNiAyNjMuMmgtMzQuNGMtMTMuNiAwLTI0LjgtMTEuMi0yNC44LTI0Ljh2LTQwYzAtMTMuNiAxMS4yLTI0LjggMjQuOC0yNC44aDM0LjRjMTMuNiAwIDI0LjggMTEuMiAyNC44IDI0Ljh2NDBjMCAxMy42LTExLjIgMjQuOC0yNC44IDI0Ljh6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSI1NDA1MCI+PC9wYXRoPjxwYXRoIGQ9Ik0zMDIuNCA0NzkuMmgtMzQuNGMtMTMuNiAwLTI0LjgtMTEuMi0yNC44LTI0LjhWNDE2YzAtMTMuNiAxMS4yLTI0LjggMjQuOC0yNC44aDM0LjRjMTMuNiAwIDI0LjggMTEuMiAyNC44IDI0Ljh2MzguNGMwIDEzLjYtMTEuMiAyNC44LTI0LjggMjQuOHoiIGZpbGw9IiNEQUU5RkYiIHAtaWQ9IjU0MDUxIj48L3BhdGg+PHBhdGggZD0iTTMwMC44IDQ2OC44aC0zMy42Yy0xMy42IDAtMjQuOC0xMS4yLTI0LjgtMjQuOHYtMzkuMmMwLTEzLjYgMTEuMi0yNC44IDI0LjgtMjQuOGgzMy42YzEzLjYgMCAyNC44IDExLjIgMjQuOCAyNC44djM5LjJjMCAxMy42LTExLjIgMjQuOC0yNC44IDI0Ljh6IiBmaWxsPSIjRkZGRkZGIiBwLWlkPSI1NDA1MiI+PC9wYXRoPjxwYXRoIGQ9Ik0zMDIuNCA2ODUuNmgtMzQuNGMtMTMuNiAwLTI0LjgtMTEuMi0yNC44LTI0Ljh2LTM4LjRjMC0xMy42IDExLjItMjQuOCAyNC44LTI0LjhoMzQuNGMxMy42IDAgMjQuOCAxMS4yIDI0LjggMjQuOHYzOC40YzAgMTMuNi0xMS4yIDI0LjgtMjQuOCAyNC44eiIgZmlsbD0iI0RBRTlGRiIgcC1pZD0iNTQwNTMiPjwvcGF0aD48cGF0aCBkPSJNMzAwLjggNjc1LjJoLTMzLjZjLTEzLjYgMC0yNC44LTExLjItMjQuOC0yNC44di0zOS4yYzAtMTMuNiAxMS4yLTI0LjggMjQuOC0yNC44aDMzLjZjMTMuNiAwIDI0LjggMTEuMiAyNC44IDI0Ljh2MzkuMmMwIDEzLjYtMTEuMiAyNC44LTI0LjggMjQuOHoiIGZpbGw9IiNGRkZGRkYiIHAtaWQ9IjU0MDU0Ij48L3BhdGg+PC9zdmc+" type="image/svg+xml">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36CFC9',
+                        dark: {
+                            100: '#1D2129',
+                            200: '#141414',
+                            300: '#0F0F0F'
+                        },
+                        light: {
+                            100: '#F2F3F5',
+                            200: '#E5E6EB',
+                            300: '#C9CDD4'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+    :root{
+        --bg:#000;
+        --panel: rgba(0,0,0,0.6);
+        --text:#fff;
+        --muted:#c7c7c7;
+        --accent:#165DFF;
+    }
+    .theme-light{
+        --bg:#ffffff;
+        --panel: rgba(255,255,255,0.95);
+        --text:#111827;
+        --muted:#6b7280;
+        --accent:#165DFF;
+    }
+    html,body{height:100%;}
+    body{background:var(--bg);color:var(--text);margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial}
+    .video-container{position:fixed;inset:0;display:flex;flex-direction:column}
+    .video-wrapper{position:relative;flex:1;display:flex;align-items:center;justify-content:center;padding:1rem;background:transparent}
+    .video-player{max-width:100%;max-height:100%;border-radius:8px;box-shadow:0 10px 40px rgba(2,6,23,0.6)}
+
+    .controls{
+        position:absolute;left:0;right:0;bottom:14px;margin:0 auto;display:flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;border-radius:10px;max-width:1100px;background:var(--panel);backdrop-filter:blur(6px)
+    }
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;border-radius:8px;padding:0.45rem 0.65rem;font-weight:600;cursor:pointer;border:1px solid transparent}
+    .icon-btn{width:40px;height:40px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center}
+    .btn-primary{background:var(--accent);color:#fff}
+    .time-display{font-size:0.9rem;color:var(--muted);min-width:72px;text-align:center}
+    .progress-bar{flex:1;height:8px;background:rgba(255,255,255,0.12);border-radius:999px;overflow:hidden;cursor:pointer;position:relative}
+    .progress{height:100%;background:var(--accent);width:0%;transition:width 150ms linear;position:relative}
+    .progress .thumb{position:absolute;top:50%;transform:translate(-50%,-50%);width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,0.4);transition:left 120ms linear;left:0}
+    .video-info{position:absolute;top:18px;left:18px;background:var(--panel);padding:0.35rem 0.6rem;border-radius:6px;color:var(--text)}
+    .close-btn,.playlist-toggle{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:10px;background:var(--panel);display:inline-flex;align-items:center;justify-content:center;border:none;color:var(--text)}
+    .playlist-toggle{right:66px}
+    .playlist-panel{position:fixed;right:-360px;top:0;width:360px;height:100%;background:var(--panel);backdrop-filter:blur(8px);transition:right 0.28s ease;padding:1rem;overflow:auto}
+    .playlist-panel.open{right:0}
+
+    /* 播放列表项样式 */
+    .playlist-item{display:flex;align-items:center;gap:0.75rem;padding:0.6rem;border-radius:8px;margin-bottom:0.5rem;background:transparent;color:var(--text);cursor:pointer}
+    .playlist-item:hover{background:rgba(255,255,255,0.03)}
+    .playlist-item.active{background:rgba(22,93,255,0.12)}
+    .playlist-item .thumbnail{width:64px;height:44px;border-radius:6px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center}
+    .playlist-item .info{flex:1;min-width:0}
+    .playlist-item .title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .playlist-item .path{font-size:0.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .playlist-item .actions{display:flex;gap:0.4rem}
+    .action-btn{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:6px}
+    .action-btn:hover{color:#ff6b6b}
+
+    /* 将播放面板 header 的关闭按钮改为右上对齐（内部） */
+    .playlist-header{position:relative}
+    .close-playlist-btn{position:absolute;right:0;top:0;background:transparent;border:none;color:var(--muted);padding:6px;border-radius:6px}
+    .close-playlist-btn:hover{color:var(--text)}
+
+    @media(max-width:768px){
+        .controls{bottom:10px;padding:0.4rem 0.6rem;border-radius:8px;flex-wrap:wrap}
+        .icon-btn{width:36px;height:36px}
+        .close-btn{top:10px;right:12px;width:36px;height:36px}
+        .playlist-toggle{right:52px}
+        .playlist-panel{width:280px}
+        /* 在小屏上将进度条单独放到一行，确保播放按钮不被挤压 */
+        .progress-bar{flex-basis:100%;order:-1;margin:8px 0;height:8px}
+        .time-display{display:none}
+    }
+    </style>
+</head>
+<body>
+    <div class="video-container">
+        <div class="video-wrapper">
+                <video id="video-player" class="video-player"></video>
+                <div class="video-info" id="video-info">
+                    <div id="video-title">视频名称</div>
+                </div>
+                <button class="close-btn" id="close-btn">
+                    <i class="fa fa-times"></i>
+                </button>
+                <button class="playlist-toggle" id="playlist-toggle">
+                    <i class="fa fa-list"></i>
+                </button>
+
+                <div class="controls" id="controls">
+                    <button id="prev-btn" class="icon-btn btn-ghost"><i class="fa fa-step-backward"></i></button>
+                    <button id="play-btn" class="icon-btn btn-primary"><i class="fa fa-play"></i></button>
+                    <button id="next-btn" class="icon-btn btn-ghost"><i class="fa fa-step-forward"></i></button>
+                    <div class="time-display" id="current-time">0:00</div>
+                    <div id="progress-bar" class="progress-bar" aria-hidden="true">
+                        <div id="progress" class="progress"><div id="progress-thumb" class="thumb"></div></div>
+                    </div>
+                    <div class="time-display" id="total-time">0:00</div>
+                    <button id="fullscreen-btn" class="icon-btn btn-ghost" title="全屏"><i class="fa fa-expand"></i></button>
+                    <button id="theme-toggle" class="icon-btn btn-ghost" title="切换主题"><i class="fa fa-adjust"></i></button>
+                </div>
+            </div>
+        
+
+    </div>
+    
+    <div class="playlist-panel" id="playlist-panel">
+        <div class="playlist-header">
+            <h3>播放列表</h3>
+            <button id="close-playlist" class="close-playlist-btn" title="关闭">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+        <div class="playlist-items" id="playlist-items">
+            <!-- 播放列表项将通过JavaScript动态添加 -->
+        </div>
+    </div>
+
+    <script>
+        // 主题初始化（统一为 theme-light / 默认暗色）
+        (function initTheme(){
+            const saved = localStorage.getItem('theme');
+            if(saved === 'light'){
+                document.documentElement.classList.add('theme-light');
+            } else if(saved === 'dark'){
+                document.documentElement.classList.remove('theme-light');
+            } else {
+                if(window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches){
+                    document.documentElement.classList.add('theme-light');
+                }
+            }
+            // 由页面上的切换按钮触发主题变化
+            document.addEventListener('DOMContentLoaded', ()=>{
+                const tbtn = document.getElementById('theme-toggle');
+                if(tbtn){
+                    tbtn.addEventListener('click', ()=>{
+                        const isLight = document.documentElement.classList.toggle('theme-light');
+                        localStorage.setItem('theme', isLight? 'light':'dark');
+                    });
+                }
+            });
+        })();
+
+        // 全局变量
+        let authToken = localStorage.getItem('authToken') || null;
+        let currentVideoIndex = 0;
+        let playlist = [];
+        let video = document.getElementById('video-player');
+        let isPlaying = false;
+        let currentPath = '';
+
+        // 从URL参数获取文件信息
+        const urlParams = new URLSearchParams(window.location.search);
+        let filePath = urlParams.get('path');
+        const fileName = urlParams.get('name') || '视频文件';
+        const password = urlParams.get('password') || localStorage.getItem('authToken');
+
+        if (!filePath || !password) {
+            alert('缺少必要参数');
+            history.back();
+        } else {
+            // URL 解码文件路径和名称
+            try { filePath = decodeURIComponent(filePath); } catch(e){}
+            try { fileName = decodeURIComponent(fileName); } catch(e){}
+            // 提取目录路径
+            currentPath = filePath.substring(0, filePath.lastIndexOf('/')) || '';
+            authToken = password;
+
+            // 直接从目录加载视频列表（无需通过URL传递）
+            loadPlaylistFromDirectory(currentPath);
+        }
+
+        // 从目录加载视频文件作为播放列表
+        async function loadPlaylistFromDirectory(path) {
+            try {
+                const response = await fetch('/api/cloud/video/playlist', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: authToken, path: path })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    playlist = data.files.map((file, index) => ({
+                        name: file.name,
+                        path: file.path,
+                        index: index
+                    }));
+                    
+                    // 找到当前播放的视频索引
+                    currentVideoIndex = playlist.findIndex(vid => vid.path === filePath);
+                    if (currentVideoIndex === -1) {
+                        // 如果当前文件不在列表中，添加到列表开头
+                        playlist.unshift({
+                            name: fileName,
+                            path: filePath,
+                            index: 0
+                        });
+                        currentVideoIndex = 0;
+                    }
+                    
+                    renderPlaylist();
+                    loadVideo(currentVideoIndex);
+                } else {
+                    console.error('加载目录失败:', data.message);
+                }
+            } catch (error) {
+                console.error('加载播放列表失败:', error);
+            }
+        }
+
+        // 渲染播放列表
+        function renderPlaylist() {
+            const container = document.getElementById('playlist-items');
+            container.innerHTML = '';
+            
+            playlist.forEach((video, index) => {
+                const item = document.createElement('div');
+                item.className = `playlist-item ${index === currentVideoIndex ? 'active' : ''}`;
+                item.dataset.index = index;
+                
+                item.innerHTML = `
+                    <div class="thumbnail">
+                        <i class="fa fa-file-video-o"></i>
+                    </div>
+                    <div class="info">
+                        <div class="title">${video.name}</div>
+                        <div class="path">${video.path}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="action-btn remove-btn" data-path="${video.path}">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                
+                item.addEventListener('click', () => {
+                    currentVideoIndex = index;
+                    loadVideo(index);
+                    renderPlaylist(); // 更新活动状态
+                });
+                
+                container.appendChild(item);
+            });
+            
+            // 添加删除按钮事件
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const pathToRemove = this.getAttribute('data-path');
+                    removeFromPlaylist(pathToRemove);
+                });
+            });
+        }
+
+        // 从播放列表中移除视频
+        function removeFromPlaylist(path) {
+            const index = playlist.findIndex(video => video.path === path);
+            if (index !== -1) {
+                playlist.splice(index, 1);
+                
+                // 更新索引
+                playlist.forEach((video, i) => {
+                    video.index = i;
+                });
+                
+                // 如果删除的是当前播放的视频
+                if (index === currentVideoIndex) {
+                    if (playlist.length === 0) {
+                        video.pause();
+                        document.getElementById('play-btn').innerHTML = '<i class="fa fa-play"></i>';
+                        isPlaying = false;
+                    } else if (index >= playlist.length) {
+                        // 播放列表变短，播放上一首
+                        currentVideoIndex = playlist.length - 1;
+                        loadVideo(currentVideoIndex);
+                    } else {
+                        // 播放下一首
+                        loadVideo(currentVideoIndex);
+                    }
+                } else if (index < currentVideoIndex) {
+                    // 删除的视频在当前视频前面，调整当前索引
+                    currentVideoIndex--;
+                }
+                
+                renderPlaylist();
+            }
+        }
+
+        // 加载视频
+        function loadVideo(index) {
+            if (index < 0 || index >= playlist.length) return;
+            
+            const videoItem = playlist[index];
+            const videoUrl = `/api/cloud/download/${encodeURIComponent(videoItem.path)}?password=${encodeURIComponent(authToken)}&inline=1`;
+            
+            // 更新视频源
+            video.src = videoUrl;
+            video.load();
+            
+            // 更新UI
+            document.getElementById('video-title').textContent = videoItem.name;
+            
+            // 如果正在播放，继续播放新视频
+            if (isPlaying) {
+                setTimeout(() => {
+                    video.play();
+                }, 300);
+            }
+        }
+
+        // 格式化时间
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+        }
+
+        // 绑定视频事件
+        video.addEventListener('loadedmetadata', () => {
+            document.getElementById('total-time').textContent = formatTime(video.duration);
+        });
+
+        video.addEventListener('timeupdate', () => {
+            if (!isSeeking) {
+                const progressPercent = (video.currentTime / video.duration) * 100;
+                const progressEl = document.getElementById('progress');
+                const thumb = document.getElementById('progress-thumb');
+                if (progressEl) progressEl.style.width = `${progressPercent}%`;
+                if (thumb) thumb.style.left = `${progressPercent}%`;
+            }
+            document.getElementById('current-time').textContent = formatTime(video.currentTime);
+        });
+
+        video.addEventListener('ended', () => {
+            playNext();
+        });
+
+        video.addEventListener('play', () => {
+            document.getElementById('play-btn').innerHTML = '<i class="fa fa-pause"></i>';
+            isPlaying = true;
+        });
+
+        video.addEventListener('pause', () => {
+            document.getElementById('play-btn').innerHTML = '<i class="fa fa-play"></i>';
+            isPlaying = false;
+        });
+
+        // 控制按钮事件
+        document.getElementById('play-btn').addEventListener('click', () => {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
+
+        document.getElementById('prev-btn').addEventListener('click', () => {
+            playPrev();
+        });
+
+        document.getElementById('next-btn').addEventListener('click', () => {
+            playNext();
+        });
+
+        document.getElementById('fullscreen-btn').addEventListener('click', () => {
+            if (video.requestFullscreen) {
+                video.requestFullscreen();
+            }
+        });
+
+        // 进度条支持：点击+拖拽+触摸，同时检测服务器是否支持 Range（可选）
+        const progressBarEl = document.getElementById('progress-bar');
+        let isSeeking = false;
+        let rangeSupported = true; // assume true until checked
+
+        async function checkRangeSupport(){
+            try{
+                // 尝试请求第一个字节（部分服务器可能不接受 HEAD）
+                const testUrl = video.src || '';
+                if(!testUrl) return;
+                const resp = await fetch(testUrl, { method: 'GET', headers: { Range: 'bytes=0-0' }});
+                if(resp.status === 206) rangeSupported = true;
+                else rangeSupported = false;
+            }catch(e){ rangeSupported = false; }
+            if(!rangeSupported && progressBarEl){
+                progressBarEl.style.pointerEvents = 'none';
+                progressBarEl.title = '当前服务器不支持跳转（不支持 Range 请求）';
+            }
+        }
+
+        function updateVisual(pos){
+            const pct = pos * 100;
+            const progressEl = document.getElementById('progress');
+            const thumb = document.getElementById('progress-thumb');
+            if(progressEl) progressEl.style.width = `${pct}%`;
+            if(thumb) thumb.style.left = `${pct}%`;
+        }
+
+        function seekToClientX(clientX, commit = false){
+            if(!video.duration || isNaN(video.duration)) return;
+            const rect = progressBarEl.getBoundingClientRect();
+            let pos = (clientX - rect.left) / rect.width;
+            pos = Math.max(0, Math.min(1, pos));
+            updateVisual(pos);
+            if(commit){
+                if(!rangeSupported){
+                    progressBarEl.title = '无法跳转：服务器可能不支持 Range';
+                    return;
+                }
+                try{
+                    video.currentTime = pos * video.duration;
+                }catch(e){
+                    console.warn('seek failed', e);
+                }
+            }
+            return pos;
+        }
+
+        if(progressBarEl){
+            progressBarEl.addEventListener('click', function(e){
+                if(!rangeSupported) return;
+                seekToClientX(e.clientX, true);
+            });
+
+            // 鼠标拖拽：视觉跟随，释放时提交
+            progressBarEl.addEventListener('mousedown', function(e){
+                if(!rangeSupported) return;
+                isSeeking = true;
+                seekToClientX(e.clientX, false);
+                document.body.style.userSelect = 'none';
+            });
+            window.addEventListener('mousemove', function(e){ if(isSeeking) seekToClientX(e.clientX, false); });
+            window.addEventListener('mouseup', function(e){ if(isSeeking){ seekToClientX(e.clientX, true); isSeeking = false; document.body.style.userSelect = ''; } });
+
+            // touch 支持
+            progressBarEl.addEventListener('touchstart', function(e){ if(e.touches && e.touches[0]){ isSeeking = true; seekToClientX(e.touches[0].clientX, false); } });
+            progressBarEl.addEventListener('touchmove', function(e){ if(isSeeking && e.touches && e.touches[0]) seekToClientX(e.touches[0].clientX, false); });
+            progressBarEl.addEventListener('touchend', function(e){ if(isSeeking){ const touch = (e.changedTouches && e.changedTouches[0]) || null; if(touch) seekToClientX(touch.clientX, true); isSeeking = false; } });
+        }
+
+        // 在元数据加载后检查 range 支持（此时 video.src 已设置）
+        video.addEventListener('loadedmetadata', ()=>{ checkRangeSupport(); });
+
+        // 播放列表开关
+        document.getElementById('playlist-toggle').addEventListener('click', () => {
+            document.getElementById('playlist-panel').classList.toggle('open');
+        });
+
+
+
+        // 关闭播放列表面板
+        const closePlaylistBtn = document.getElementById('close-playlist');
+        if (closePlaylistBtn) {
+            closePlaylistBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.getElementById('playlist-panel').classList.remove('open');
+            });
+        }
+
+        // 关闭按钮功能
+        document.getElementById('close-btn').addEventListener('click', () => {
+            video.pause();
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/';
+            }
+        });
+
+        // 上一首
+        function playPrev() {
+            currentVideoIndex--;
+            if (currentVideoIndex < 0) {
+                currentVideoIndex = playlist.length - 1;
+            }
+            loadVideo(currentVideoIndex);
+            renderPlaylist();
+        }
+
+        // 下一首
+        function playNext() {
+            currentVideoIndex++;
+            if (currentVideoIndex >= playlist.length) {
+                currentVideoIndex = 0;
+            }
+            loadVideo(currentVideoIndex);
+            renderPlaylist();
+        }
+    </script>
+</body>
+</html>
