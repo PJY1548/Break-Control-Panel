@@ -1388,15 +1388,9 @@
                         previewType = 'document';
                     }
                     
-                    // 如果可以预览，跳转到预览页面
+                    // 如果可以预览，使用统一的 previewFile 接口处理（会附带播放列表）
                     if (previewType) {
-                        const params = new URLSearchParams({
-                            type: previewType,
-                            path: file.path,
-                            name: file.name,
-                            password: authToken
-                        });
-                        window.location.href = `/preview.html?${params.toString()}`;
+                        previewFile(file);
                     }
                 });
             }
@@ -1487,6 +1481,73 @@
             const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 获取指定目录下的音频/视频文件列表
+        async function getMediaFilesInDirectory(dirPath, type = 'audio') {
+            try {
+                const response = await fetch('/api/cloud/list', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: authToken, path: dirPath })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    let extensions = [];
+                    if (type === 'audio') {
+                        extensions = ['.mp3', '.wav', '.flac', '.aac', '.m4a', '.ogg', '.wma'];
+                    } else if (type === 'video') {
+                        extensions = ['.mp4', '.avi', '.mov', '.mkv', '.webm', '.flv', '.wmv', '.m4v'];
+                    }
+                    const mediaFiles = data.files.filter(file => {
+                        return !file.isDirectory && extensions.some(ext => file.name.toLowerCase().endsWith(ext));
+                    });
+                    mediaFiles.sort((a, b) => a.name.localeCompare(b.name));
+                    return mediaFiles.map(file => ({ name: file.name, path: file.path }));
+                } else {
+                    console.error('加载目录失败:', data.message);
+                    return [];
+                }
+            } catch (error) {
+                console.error('获取媒体文件列表失败:', error);
+                return [];
+            }
+        }
+
+        // 打开音频播放器，不再通过URL传递playlist（避免HTTP 431错误）
+        async function openAudioPlayer(filePath, fileName) {
+            if (!authToken) { showCloudResult('请先登录', false); return; }
+            const params = new URLSearchParams({ path: encodeURIComponent(filePath), name: encodeURIComponent(fileName), password: encodeURIComponent(authToken) });
+            window.open(`/music.html?${params.toString()}`, '_blank');
+        }
+
+        // 打开视频播放器，不再通过URL传递playlist（避免HTTP 431错误）
+        async function openVideoPlayer(filePath, fileName) {
+            if (!authToken) { showCloudResult('请先登录', false); return; }
+            const params = new URLSearchParams({ path: encodeURIComponent(filePath), name: encodeURIComponent(fileName), password: encodeURIComponent(authToken) });
+            window.open(`/video.html?${params.toString()}`, '_blank');
+        }
+
+        // 统一的预览入口，根据文件类型打开相应播放器或预览页面
+        function previewFile(file) {
+            if (!authToken) { showCloudResult('请先登录', false); return; }
+            const filePath = normalizePath(file.path);
+            const fileName = file.name;
+            const ext = (file.name || '').split('.').pop().toLowerCase();
+            if (['mp3','wav','flac','ogg','m4a','aac','wma','opus'].includes(ext)) {
+                openAudioPlayer(filePath, fileName);
+            } else if (['mp4','avi','mov','mkv','webm','flv','wmv'].includes(ext)) {
+                openVideoPlayer(filePath, fileName);
+            } else if (['jpg','jpeg','png','gif','webp','bmp','svg'].includes(ext)) {
+                const params = new URLSearchParams({ path: encodeURIComponent(filePath), name: encodeURIComponent(fileName), password: encodeURIComponent(authToken) });
+                window.open(`/picture.html?${params.toString()}`, '_blank');
+            } else if (['epub','pdf','doc','docx','xls','xlsx','ppt','pptx'].includes(ext)) {
+                const params = new URLSearchParams({ path: encodeURIComponent(filePath), name: encodeURIComponent(fileName), password: encodeURIComponent(authToken) });
+                window.open(`/document.html?${params.toString()}`, '_blank');
+            } else {
+                const params = new URLSearchParams({ path: encodeURIComponent(filePath), name: encodeURIComponent(fileName), type: file.type || '', password: encodeURIComponent(authToken) });
+                window.open(`/preview.html?${params.toString()}`, '_blank');
+            }
         }
 
         // 更新路径显示（修复分隔符重复问题）
